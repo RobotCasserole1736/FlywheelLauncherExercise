@@ -14,11 +14,13 @@ The visualization should have the following:
 4) A "goal" of a fixed size, at a fixed X coordinate that is visually about 5x the robot's length away from the robot, and with an API to adjust its center location in the Y direction. I will write code to call this api to supply the vertical position.
 5) An additional API for the goal which causes it to "light up" and be a brighter color, or be darker and not lit up.
 6) The floor should be grey colored, the background ("air") may be white. A black line at Y=0 should divide the "floor" (y<0) from the "air" (y>0)
+7) A display at the top that shows the score, and a time countdown. An API to set both numbers.
+
 
 Finally, there should be an API to determine if the user has closed the window and it is no longer visible.
 
 The view window only needs to go down to about -10 in the Y dimension. Pick the upper limit for Y and both x limits to allow some margin around the drawn objects, but we don't need a ton.
 
-Be sure to avoid flickering. Double-buffering and swapping the visible frame in a single call (rather than clearing and redrawing) is a good technique.
+Be sure to avoid flickering. Using canvas.after() to do animation is the recommended way to do this.
 
 Remember tkinter can only take `int` types for inputs of pixel coordiantes - be sure all pixel coordinate calcualtions use `int` or `round` or something similar to convert.

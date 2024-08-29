@@ -34,6 +34,11 @@ class Visualization:
         self.goal_height = 120
         self.goal_lit_up = False
 
+        # Scoring and time display
+        self.score = 0
+        self.time_remaining = 120  # seconds
+
+
         # Set the close flag
         self.window_closed = False
         self.root.protocol("WM_DELETE_WINDOW", self._on_close)
@@ -124,6 +129,11 @@ class Visualization:
             fill=goal_color
         )
 
+        # Draw score and time
+        self.canvas.create_text(self.canvas_width // 2, 20, text=f"Score: {self.score}", font=("Arial", 16))
+        self.canvas.create_text(self.canvas_width // 2, 40, text=f"Time Remaining: {self.time_remaining:6.2f}s", font=("Arial", 16))
+
+
     def set_shooter_speed(self, speed):
         """Set the shooter wheel speed in radians per second."""
         self.shooter_wheel_speed = speed
@@ -144,6 +154,13 @@ class Visualization:
     def set_goal_lit_up(self, lit_up):
         """Set whether the goal is lit up."""
         self.goal_lit_up = lit_up
+        
+    def set_score(self, score):
+        self.score = score
+
+    def set_time_remaining(self, time_seconds):
+        self.time_remaining = time_seconds
+    
 
     def is_window_open(self):
         """Check if the visualization window is still open."""
