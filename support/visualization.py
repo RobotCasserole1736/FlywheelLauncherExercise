@@ -30,13 +30,19 @@ class Visualization:
         # Goal parameters
         self.goal_x = self.robot_x + 5 * self.robot_length
         self.goal_center_y = 200
-        self.goal_width = 40
+        self.goal_width = 10
         self.goal_height = 120
         self.goal_lit_up = False
 
         # Scoring and time display
         self.score = 0
         self.time_remaining = 120  # seconds
+
+        # Telemetry
+        self.shooterRPM = 0.0
+        self.hoodAngleDeg = 0.0
+        self.timeTillActive = 0.0
+        self.goalHeight = 0.0
 
 
         # Set the close flag
@@ -126,7 +132,7 @@ class Visualization:
             int(self.shooter_center[1] - self.shooter_radius - self.ball_diameter / 2),
             int(self.shooter_center[0] + self.shooter_radius + self.ball_diameter / 2),
             int(self.shooter_center[1] + self.shooter_radius + self.ball_diameter / 2),
-            start=180, extent=-self.hood_angle - 90, 
+            start=180, extent=self.hood_angle - 90, 
             outline='black', style=tk.ARC, width=2
         )
 
@@ -152,14 +158,25 @@ class Visualization:
             fill=goal_color
         )
 
-        # Draw score and time
-        self.canvas.create_text(self.canvas_width // 2, 20, text=f"Score: {self.score}", font=("Arial", 16))
-        self.canvas.create_text(self.canvas_width // 2, 40, text=f"Time Remaining: {self.time_remaining:6.2f}s", font=("Arial", 16))
+        self.canvas.create_line(
+            self.goal_x, self.robot_y, self.goal_x, 0,
+            fill='black', dash=(3,2)
+        )
+
+        # Draw Telemetry
+        textColor = "black" if self.time_remaining > 0 else "grey"
+        self.canvas.create_text(self.canvas_width // 6, 15, text=f"Score: {self.score}", font=("Consolas", 12))
+        self.canvas.create_text(self.canvas_width // 6, 30, text=f"Time: {self.time_remaining:6.2f}s", font=("Consolas", 12))
+        self.canvas.create_text(self.canvas_width // 6, 45, text=f"Goal Active In: {self.timeTillActive:4.2f}s", font=("Consolas", 12), fill=textColor)
+
+        self.canvas.create_text(self.canvas_width // 2, 15, text=f"Flywheel: {self.shooterRPM:6.1f}RPM", font=("Consolas", 12), fill=textColor)
+        self.canvas.create_text(self.canvas_width // 2, 30, text=f"Hood: {self.hoodAngleDeg:3.0f}deg", font=("Consolas", 12), fill=textColor)
+        self.canvas.create_text(self.canvas_width // 2, 45, text=f"Goal: {self.goalHeight:4.0f}cm", font=("Consolas", 12), fill=textColor)
 
 
     def set_shooter_speed(self, speed):
         """Set the shooter wheel speed in radians per second."""
-        self.shooter_wheel_speed = speed * 0.1 #hack 
+        self.shooter_wheel_speed = speed * 0.01 #hack 
 
     def set_hood_extension(self, angle):
         """Set the hood angle in degrees from horizontal."""
@@ -185,6 +202,12 @@ class Visualization:
 
     def set_time_remaining(self, time_seconds):
         self.time_remaining = time_seconds
+
+    def set_telemetry(self, shooterRPM, hoodAngleDeg, timeTillActive, goalHeight):
+        self.shooterRPM = shooterRPM
+        self.hoodAngleDeg = hoodAngleDeg
+        self.timeTillActive = timeTillActive
+        self.goalHeight = goalHeight
     
 
     def is_window_open(self):

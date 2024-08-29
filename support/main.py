@@ -13,7 +13,7 @@ robot = None
 cur_hood_angle_deg = 0.0
 cur_flywheel_spd_rpm = 0.0
 time_until_goal_active_sec = 5.0
-cur_goal_height_in = 0
+cur_goal_height_cm = 0
 
 time_remaining_sec = 60.0
 
@@ -52,7 +52,7 @@ def _plantUpdate():
     global cur_hood_angle_deg
     global cur_flywheel_spd_rpm
     global time_until_goal_active_sec
-    global cur_goal_height_in
+    global cur_goal_height_cm
     global time_remaining_sec
     global hood_motor_cmd_v
     global flywheel_motor_cmd_v
@@ -61,23 +61,25 @@ def _plantUpdate():
     if(time_remaining_sec > 0.0):
         time_remaining_sec = max(0.0, time_remaining_sec - 0.02)
         vis.set_time_remaining(time_remaining_sec)
-        (cur_hood_angle_deg, cur_flywheel_spd_rpm, time_until_goal_active_sec, cur_goal_height_in, ball_coords, ball_active) = plant.plantUpdate(hood_motor_cmd_v, flywheel_motor_cmd_v,should_launch)
+        (cur_hood_angle_deg, cur_flywheel_spd_rpm, time_until_goal_active_sec, cur_goal_height_cm, ball_coords, ball_active, cur_score) = plant.plantUpdate(hood_motor_cmd_v, flywheel_motor_cmd_v,should_launch)
         vis.set_ball_position(ball_coords[0], ball_coords[1], ball_active)
         vis.set_hood_extension(cur_hood_angle_deg)
         vis.set_shooter_speed(cur_flywheel_spd_rpm)
         vis.set_goal_lit_up(time_until_goal_active_sec == 0.0)
-        vis.set_goal_position(cur_goal_height_in)
+        vis.set_goal_position(cur_goal_height_cm)
+        vis.set_score(cur_score)
+        vis.set_telemetry(cur_flywheel_spd_rpm, cur_hood_angle_deg,time_until_goal_active_sec,cur_goal_height_cm)
 
 def _robotUpdate():
     global robot
     global cur_hood_angle_deg
     global cur_flywheel_spd_rpm
     global time_until_goal_active_sec
-    global cur_goal_height_in
+    global cur_goal_height_cm
     global time_remaining_sec
     global hood_motor_cmd_v
     global flywheel_motor_cmd_v
     global should_launch
 
     if(time_remaining_sec > 0.0):
-        hood_motor_cmd_v, flywheel_motor_cmd_v, should_launch = robot.robotPeriodic(cur_hood_angle_deg, cur_flywheel_spd_rpm, time_until_goal_active_sec, cur_goal_height_in)
+        hood_motor_cmd_v, flywheel_motor_cmd_v, should_launch = robot.robotPeriodic(cur_hood_angle_deg, cur_flywheel_spd_rpm, time_until_goal_active_sec, cur_goal_height_cm)
