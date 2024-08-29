@@ -46,7 +46,7 @@ def main(robot_in:TimedRobot):
     vis.start()
 
     # Wait for simulation to finish
-    while(time_remaining_sec > 0.0):
+    while(time_remaining_sec > 0.0 and vis.is_window_open()):
         time.sleep(0.1)
 
     # Mark the simulation as running
@@ -74,6 +74,10 @@ def _plantUpdate():
     if(sim_running):
         time_remaining_sec = max(0.0, time_remaining_sec - 0.02)
         vis.set_time_remaining(time_remaining_sec)
+        (cur_hood_angle_deg, cur_flywheel_spd_rpm, time_until_goal_active_sec, cur_goal_height_in, ball_coords, ball_active) = plant.plantUpdate(hood_motor_cmd_v, flywheel_motor_cmd_v,should_launch)
+        vis.set_ball_position(ball_coords[0], ball_coords[1], ball_active)
+        vis.set_hood_extension(cur_hood_angle_deg)
+        vis.set_shooter_speed(cur_flywheel_spd_rpm)
 
 def _robotUpdate():
     global robot

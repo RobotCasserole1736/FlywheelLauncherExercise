@@ -64,7 +64,7 @@ class Visualization:
         self.canvas.create_rectangle(
             self.robot_x, self.robot_y - self.robot_height,
             self.robot_x + self.robot_length, self.robot_y,
-            fill='grey'
+            fill='tan'
         )
 
         # Draw robot bumper with team number
@@ -88,9 +88,32 @@ class Visualization:
             fill='red'
         )
 
-        # Shooter wheel marking
+        # Shooter wheel markings
         mark_x = self.shooter_center[0] + self.shooter_radius * math.cos(self.shooter_mark_angle)
         mark_y = self.shooter_center[1] + self.shooter_radius * math.sin(self.shooter_mark_angle)
+        self.canvas.create_line(
+            int(self.shooter_center[0]), int(self.shooter_center[1]),
+            int(mark_x), int(mark_y),
+            fill='white', width=2
+        )
+        mark_x = self.shooter_center[0] + self.shooter_radius * math.cos(self.shooter_mark_angle+math.pi/2.0)
+        mark_y = self.shooter_center[1] + self.shooter_radius * math.sin(self.shooter_mark_angle+math.pi/2.0)
+        self.canvas.create_line(
+            int(self.shooter_center[0]), int(self.shooter_center[1]),
+            int(mark_x), int(mark_y),
+            fill='black', width=2
+        )
+
+        mark_x = self.shooter_center[0] + self.shooter_radius * math.cos(self.shooter_mark_angle+math.pi)
+        mark_y = self.shooter_center[1] + self.shooter_radius * math.sin(self.shooter_mark_angle+math.pi)
+        self.canvas.create_line(
+            int(self.shooter_center[0]), int(self.shooter_center[1]),
+            int(mark_x), int(mark_y),
+            fill='black', width=2
+        )
+
+        mark_x = self.shooter_center[0] + self.shooter_radius * math.cos(self.shooter_mark_angle+math.pi*3.0/2.0)
+        mark_y = self.shooter_center[1] + self.shooter_radius * math.sin(self.shooter_mark_angle+math.pi*3.0/2.0)
         self.canvas.create_line(
             int(self.shooter_center[0]), int(self.shooter_center[1]),
             int(mark_x), int(mark_y),
@@ -103,7 +126,7 @@ class Visualization:
             int(self.shooter_center[1] - self.shooter_radius - self.ball_diameter / 2),
             int(self.shooter_center[0] + self.shooter_radius + self.ball_diameter / 2),
             int(self.shooter_center[1] + self.shooter_radius + self.ball_diameter / 2),
-            start=180, extent=-self.hood_angle, 
+            start=180, extent=-self.hood_angle - 90, 
             outline='black', style=tk.ARC, width=2
         )
 
@@ -136,15 +159,16 @@ class Visualization:
 
     def set_shooter_speed(self, speed):
         """Set the shooter wheel speed in radians per second."""
-        self.shooter_wheel_speed = speed
+        self.shooter_wheel_speed = speed * 0.1 #hack 
 
     def set_hood_extension(self, angle):
-        """Set the hood angle in degrees from vertical."""
+        """Set the hood angle in degrees from horizontal."""
         self.hood_angle = angle
 
     def set_ball_position(self, x, y, visible=True):
         """Set the ball's position and visibility."""
-        self.ball_position = (x, y)
+        y = self.robot_y - y
+        self.ball_position = (int(x), int(y))
         self.ball_visible = visible
 
     def set_goal_position(self, y):
@@ -179,7 +203,7 @@ class Visualization:
         # Rotate the shooter wheel marking
         self.shooter_mark_angle += self.shooter_wheel_speed * 0.05  # Adjust speed and time factor
 
-        self.canvas.after(50, self._animate)  # Schedule next animation frame
+        self.canvas.after(20, self._animate)  # Schedule next animation frame
 
     def start(self):
         """Start the Tkinter main loop."""

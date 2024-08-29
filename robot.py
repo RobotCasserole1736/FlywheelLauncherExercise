@@ -17,9 +17,11 @@ class MyRobot(TimedRobot):
         
         # TODO - this is a very simple strategy. It rarely works.
         # Pick a new strategy for calculating each variable that scores more points.
-        hood_motor_cmd_v = 0.0
-        flywheel_motor_cmd_v = 10.0
-        should_launch = (time_until_goal_active_sec == 0)
+        hood_motor_cmd_v =-12.0
+        flywheel_motor_cmd_v = 12.0
+        should_launch = (time_until_goal_active_sec == 0 and cur_flywheel_spd_rpm > 5000)
+
+        print(cur_flywheel_spd_rpm)
         
         # Do not change code below this line
         return (hood_motor_cmd_v,flywheel_motor_cmd_v,should_launch) 
