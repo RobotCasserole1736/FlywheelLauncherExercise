@@ -173,6 +173,7 @@ class Visualization:
 
     def set_goal_position(self, y):
         """Set the vertical position of the goal."""
+        y = self.robot_y - y
         self.goal_center_y = y
 
     def set_goal_lit_up(self, lit_up):

@@ -1,4 +1,5 @@
 import math
+import random
 
 from support.filter import ExpFilter
 BALL_LAUNCH_X = 150.0
@@ -34,8 +35,12 @@ class Plant():
 
         self.flywheelExpFilter = ExpFilter(0.05) # constant controls accel
         self.hoodExpFilter = ExpFilter(0.1)
+        self.goalHeightExpFilter = ExpFilter(0.15)
 
         self.should_launch_prev = False
+
+        self.goal_active_timer = self.ACTIVE_DWELL_TIME_SEC
+        self.goal_height_tgt = 100
 
     def plantUpdate(self, hood_motor_cmd_v, flywheel_motor_cmd_v, should_launch):
 
@@ -77,7 +82,24 @@ class Plant():
             if(offScreen or tooSlow):
                 self.ball_active = False
 
+        ######################################################################################
+        # Goal Plant
+        if(self.time_until_goal_active_sec <= 0.0):
+            self.goal_active_timer -= 0.02
+            if(self.goal_active_timer <= 0.0):
+                # transition to new active position
+                self.time_until_goal_active_sec = random.uniform(3.0, 5.0)
+                self.goal_height_tgt = int(random.uniform(50,300))
 
+        else:
+            self.time_until_goal_active_sec -= 0.02
+            self.goal_active_timer = self.ACTIVE_DWELL_TIME_SEC
+
+        self.cur_goal_height_in = self.goalHeightExpFilter.smooth(self.goal_height_tgt)
+        self.time_until_goal_active_sec = saturate(self.time_until_goal_active_sec, 0.0, 100.0)
+
+        ######################################################################################
+        # Ball/Goal score Plant
 
         ######################################################################################
         # Hood Plant

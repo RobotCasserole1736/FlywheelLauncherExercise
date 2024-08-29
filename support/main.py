@@ -21,8 +21,6 @@ hood_motor_cmd_v = 0.0
 flywheel_motor_cmd_v = 0.0
 should_launch = False
 
-sim_running=True
-
 
 def main(robot_in:TimedRobot):
     global time_remaining_sec
@@ -45,16 +43,6 @@ def main(robot_in:TimedRobot):
 
     vis.start()
 
-    # Wait for simulation to finish
-    while(time_remaining_sec > 0.0 and vis.is_window_open()):
-        time.sleep(0.1)
-
-    # Mark the simulation as running
-    sim_running = False
-
-    # wait for user to close window
-    while(vis.is_window_open()):
-        time.sleep(0.1)
 
 
 
@@ -69,15 +57,16 @@ def _plantUpdate():
     global hood_motor_cmd_v
     global flywheel_motor_cmd_v
     global should_launch
-    global sim_running
 
-    if(sim_running):
+    if(time_remaining_sec > 0.0):
         time_remaining_sec = max(0.0, time_remaining_sec - 0.02)
         vis.set_time_remaining(time_remaining_sec)
         (cur_hood_angle_deg, cur_flywheel_spd_rpm, time_until_goal_active_sec, cur_goal_height_in, ball_coords, ball_active) = plant.plantUpdate(hood_motor_cmd_v, flywheel_motor_cmd_v,should_launch)
         vis.set_ball_position(ball_coords[0], ball_coords[1], ball_active)
         vis.set_hood_extension(cur_hood_angle_deg)
         vis.set_shooter_speed(cur_flywheel_spd_rpm)
+        vis.set_goal_lit_up(time_until_goal_active_sec == 0.0)
+        vis.set_goal_position(cur_goal_height_in)
 
 def _robotUpdate():
     global robot
@@ -89,7 +78,6 @@ def _robotUpdate():
     global hood_motor_cmd_v
     global flywheel_motor_cmd_v
     global should_launch
-    global sim_running
 
-    if(sim_running):
+    if(time_remaining_sec > 0.0):
         hood_motor_cmd_v, flywheel_motor_cmd_v, should_launch = robot.robotPeriodic(cur_hood_angle_deg, cur_flywheel_spd_rpm, time_until_goal_active_sec, cur_goal_height_in)
