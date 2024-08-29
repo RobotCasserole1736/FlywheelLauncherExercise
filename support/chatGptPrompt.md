@@ -17,3 +17,8 @@ The visualization should have the following:
 
 Finally, there should be an API to determine if the user has closed the window and it is no longer visible.
 
+The view window only needs to go down to about -10 in the Y dimension. Pick the upper limit for Y and both x limits to allow some margin around the drawn objects, but we don't need a ton.
+
+Be sure to avoid flickering. Double-buffering and swapping the visible frame in a single call (rather than clearing and redrawing) is a good technique.
+
+Remember tkinter can only take `int` types for inputs of pixel coordiantes - be sure all pixel coordinate calcualtions use `int` or `round` or something similar to convert.

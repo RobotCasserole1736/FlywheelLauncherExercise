@@ -1,7 +1,5 @@
 import tkinter as tk
 import math
-import threading
-import time
 
 class Visualization:
     def __init__(self):
@@ -9,7 +7,7 @@ class Visualization:
         self.root = tk.Tk()
         self.root.title("FRC Robot Visualization")
         self.canvas_width = 800
-        self.canvas_height = 600
+        self.canvas_height = 400
         self.canvas = tk.Canvas(self.root, bg='white', width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
 
@@ -17,7 +15,7 @@ class Visualization:
         self.robot_length = 100
         self.robot_height = 60
         self.robot_x = 50
-        self.robot_y = 300
+        self.robot_y = 350
         self.shooter_radius = 15
         self.shooter_center = (self.robot_x + self.robot_length, self.robot_y)
         self.shooter_wheel_speed = 0  # radians per second
@@ -36,22 +34,24 @@ class Visualization:
         self.goal_height = 120
         self.goal_lit_up = False
 
-        # Draw initial setup
-        self._draw_floor()
-        self._draw_robot()
-        self._draw_goal()
+        # Set the close flag
+        self.window_closed = False
+        self.root.protocol("WM_DELETE_WINDOW", self._on_close)
 
-        # Start the animation thread
+        # Start the animation
         self.running = True
-        self.animation_thread = threading.Thread(target=self._animate)
-        self.animation_thread.start()
+        self._animate()  # Use after() method instead of while loop
 
     def _draw_floor(self):
         """Draw the floor and the air division line."""
-        # Draw grey floor
-        self.canvas.create_rectangle(0, self.robot_y, self.canvas_width, self.canvas_height, fill='grey', outline='')
-        # Draw black line dividing floor and air
-        self.canvas.create_line(0, self.robot_y, self.canvas_width, self.robot_y, fill='black')
+        self.canvas.create_rectangle(
+            0, self.robot_y, self.canvas_width, self.canvas_height,
+            fill='grey', outline='grey'
+        )
+        self.canvas.create_line(
+            0, self.robot_y, self.canvas_width, self.robot_y,
+            fill='black'
+        )
 
     def _draw_robot(self):
         """Draw the robot with a shooter wheel, hood, and bumper."""
@@ -59,14 +59,14 @@ class Visualization:
         self.canvas.create_rectangle(
             self.robot_x, self.robot_y - self.robot_height,
             self.robot_x + self.robot_length, self.robot_y,
-            outline='black', fill='grey'
+            fill='grey'
         )
 
         # Draw robot bumper with team number
         self.canvas.create_rectangle(
             self.robot_x - 10, self.robot_y - 10,
             self.robot_x + self.robot_length + 10, self.robot_y,
-            outline='red', fill='red'
+            fill='red'
         )
         self.canvas.create_text(
             self.robot_x + self.robot_length / 2, self.robot_y - 5,
@@ -76,27 +76,29 @@ class Visualization:
         # Draw shooter wheel with rotating markings
         self.shooter_center = (self.robot_x + self.robot_length, self.robot_y - self.robot_height)
         self.canvas.create_oval(
-            self.shooter_center[0] - self.shooter_radius, self.shooter_center[1] - self.shooter_radius,
-            self.shooter_center[0] + self.shooter_radius, self.shooter_center[1] + self.shooter_radius,
-            outline='black', fill='red'
+            int(self.shooter_center[0] - self.shooter_radius), 
+            int(self.shooter_center[1] - self.shooter_radius),
+            int(self.shooter_center[0] + self.shooter_radius), 
+            int(self.shooter_center[1] + self.shooter_radius),
+            fill='red'
         )
 
         # Shooter wheel marking
         mark_x = self.shooter_center[0] + self.shooter_radius * math.cos(self.shooter_mark_angle)
         mark_y = self.shooter_center[1] + self.shooter_radius * math.sin(self.shooter_mark_angle)
         self.canvas.create_line(
-            self.shooter_center[0], self.shooter_center[1],
-            mark_x, mark_y,
+            int(self.shooter_center[0]), int(self.shooter_center[1]),
+            int(mark_x), int(mark_y),
             fill='black', width=2
         )
 
         # Draw hood arc
         self.canvas.create_arc(
-            self.shooter_center[0] - self.shooter_radius - self.ball_diameter / 2, 
-            self.shooter_center[1] - self.shooter_radius - self.ball_diameter / 2,
-            self.shooter_center[0] + self.shooter_radius + self.ball_diameter / 2,
-            self.shooter_center[1] + self.shooter_radius + self.ball_diameter / 2,
-            start=90, extent=-self.hood_angle, 
+            int(self.shooter_center[0] - self.shooter_radius - self.ball_diameter / 2), 
+            int(self.shooter_center[1] - self.shooter_radius - self.ball_diameter / 2),
+            int(self.shooter_center[0] + self.shooter_radius + self.ball_diameter / 2),
+            int(self.shooter_center[1] + self.shooter_radius + self.ball_diameter / 2),
+            start=180, extent=-self.hood_angle, 
             outline='black', style=tk.ARC, width=2
         )
 
@@ -104,18 +106,22 @@ class Visualization:
         if self.ball_visible:
             ball_x, ball_y = self.ball_position
             self.canvas.create_oval(
-                ball_x - self.ball_diameter / 2, ball_y - self.ball_diameter / 2,
-                ball_x + self.ball_diameter / 2, ball_y + self.ball_diameter / 2,
-                outline='black', fill='orange'
+                int(ball_x - self.ball_diameter / 2), 
+                int(ball_y - self.ball_diameter / 2),
+                int(ball_x + self.ball_diameter / 2), 
+                int(ball_y + self.ball_diameter / 2),
+                fill='orange'
             )
 
     def _draw_goal(self):
         """Draw the goal with the ability to light it up."""
         goal_color = 'yellow' if self.goal_lit_up else 'darkgrey'
         self.canvas.create_rectangle(
-            self.goal_x - self.goal_width / 2, self.goal_center_y - self.goal_height / 2,
-            self.goal_x + self.goal_width / 2, self.goal_center_y + self.goal_height / 2,
-            outline='black', fill=goal_color
+            int(self.goal_x - self.goal_width / 2), 
+            int(self.goal_center_y - self.goal_height / 2),
+            int(self.goal_x + self.goal_width / 2), 
+            int(self.goal_center_y + self.goal_height / 2),
+            fill=goal_color
         )
 
     def set_shooter_speed(self, speed):
@@ -139,16 +145,24 @@ class Visualization:
         """Set whether the goal is lit up."""
         self.goal_lit_up = lit_up
 
+    def is_window_open(self):
+        """Check if the visualization window is still open."""
+        return not self.window_closed
+
     def _animate(self):
         """Animate the visualization, including rotating the shooter wheel."""
-        while self.running:
-            self.canvas.delete("all")  # Clear the canvas
-            self._draw_floor()
-            self._draw_robot()
-            self._draw_goal()
-            # Rotate the shooter wheel marking
-            self.shooter_mark_angle += self.shooter_wheel_speed * 0.05  # Adjust speed and time factor
-            time.sleep(0.05)  # Refresh rate
+        if not self.running:
+            return
+        
+        self.canvas.delete("all")  # Clear the canvas
+        self._draw_floor()
+        self._draw_robot()
+        self._draw_goal()
+
+        # Rotate the shooter wheel marking
+        self.shooter_mark_angle += self.shooter_wheel_speed * 0.05  # Adjust speed and time factor
+
+        self.canvas.after(50, self._animate)  # Schedule next animation frame
 
     def start(self):
         """Start the Tkinter main loop."""
@@ -157,14 +171,18 @@ class Visualization:
     def stop(self):
         """Stop the animation and close the window."""
         self.running = False
-        self.animation_thread.join()
         self.root.destroy()
+
+    def _on_close(self):
+        """Handle window close event."""
+        self.window_closed = True
+        self.stop()
 
 # Example usage:
 if __name__ == "__main__":
     viz = Visualization()
     viz.set_shooter_speed(2)  # Set shooter wheel speed in radians per second
-    viz.set_hood_extension(45)  # Extend hood to 45 degrees
+    viz.set_hood_extension(60)  # Extend hood to 45 degrees
     viz.set_ball_position(300, 200, True)  # Set ball position and make it visible
     viz.set_goal_position(180)  # Adjust goal position
     viz.set_goal_lit_up(True)  # Light up the goal
