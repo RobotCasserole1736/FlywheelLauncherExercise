@@ -1,6 +1,6 @@
 # Flywheel Launcher Exercise
 
-![screenshot](img/screenshot.png)
+![screenshot](img/screenshot.gif)
 
 ## The Game
 
